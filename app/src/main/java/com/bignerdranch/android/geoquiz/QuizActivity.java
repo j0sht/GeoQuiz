@@ -14,6 +14,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mPrevButton;
     private TextView mQuestionTexView;
     // Model objects
     private Question[] mQuestionBank = new Question[] {
@@ -69,6 +70,13 @@ public class QuizActivity extends AppCompatActivity {
                 goToNextQuestion();
             }
         });
+        mPrevButton = (Button) findViewById(R.id.prev_button);
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToPrevQuestion();
+            }
+        });
         updateQuestion();
     }
     // Private methods
@@ -78,6 +86,10 @@ public class QuizActivity extends AppCompatActivity {
     }
     private void goToNextQuestion() {
         mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+        updateQuestion();
+    }
+    private void goToPrevQuestion() {
+        mCurrentIndex = (mCurrentIndex == 0) ? mQuestionBank.length - 1 : mCurrentIndex - 1;
         updateQuestion();
     }
     private void checkAnswer(boolean userPressedTrue) {
