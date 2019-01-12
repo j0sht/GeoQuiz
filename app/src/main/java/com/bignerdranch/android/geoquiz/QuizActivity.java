@@ -37,6 +37,12 @@ public class QuizActivity extends AppCompatActivity {
         // This method accepts a resource ID of a widget and returns a (generic) View object
         // Because it returns a View object, must downcast to appropriate widget
         mQuestionTexView = (TextView) findViewById(R.id.question_text_view);
+        mQuestionTexView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToNextQuestion();
+            }
+        });
         mTrueButton = (Button) findViewById(R.id.true_button);
         // The setOnClickListener(OnClickListener) method takes a listener as its argument.
         // In particular, it takes an object that implements OnClickListener.
@@ -60,8 +66,7 @@ public class QuizActivity extends AppCompatActivity {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                updateQuestion();
+                goToNextQuestion();
             }
         });
         updateQuestion();
@@ -70,6 +75,10 @@ public class QuizActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResID();
         mQuestionTexView.setText(question);
+    }
+    private void goToNextQuestion() {
+        mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+        updateQuestion();
     }
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
