@@ -80,10 +80,10 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                updateQuestion();
+                updateView();
             }
         });
-        updateQuestion();
+        updateView();
     }
     @Override
     protected void onStart() {
@@ -133,10 +133,6 @@ public class QuizActivity extends AppCompatActivity {
         outState.putInt(KEY_INDEX, mCurrentIndex);
     }
     // Private methods
-    private void updateQuestion() {
-        int question = mQuestionBank[mCurrentIndex].getTextResID();
-        mQuestionTexView.setText(question);
-    }
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         int messageResID = 0;
@@ -150,5 +146,18 @@ public class QuizActivity extends AppCompatActivity {
         //  you are inside of the anonymous inner class, not QuizActivity.
         // After creating the Toast, call show to get it on the screen.
         Toast.makeText(this, messageResID, Toast.LENGTH_SHORT).show();
+        mQuestionBank[mCurrentIndex].setAnswerGiven(true);
+        updateView();
+    }
+    private void updateView() {
+        if (mQuestionBank[mCurrentIndex].isAnswerGiven()) {
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        } else {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
+        int question = mQuestionBank[mCurrentIndex].getTextResID();
+        mQuestionTexView.setText(question);
     }
 }
