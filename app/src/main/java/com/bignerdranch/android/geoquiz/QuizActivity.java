@@ -2,12 +2,17 @@ package com.bignerdranch.android.geoquiz;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
+    // Private static member variables
+    // TAG is used in the first parameter to android.Util.Log.d(String tag, String msg)
+    // TAG makes it easy to determine the source of the msg
+    private static final String TAG = "QuizActivity";
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
     // View objects
@@ -25,11 +30,21 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
     private int mCurrentIndex = 0;
-    @Override
+    // ACTIVITY LIFECYCLE METHODS
     // The onCreate(Bundle) method is called when an instance of the activity
     //  subclass is created.
+    // The OS calls this method after the activity instance is created, but before
+    //  it is put on screen.
+    // Typically, an activity overrides onCreate(Bundle) to prepare the specifics of
+    //  its UI:
+    //   1) Inflating widgets and putting them on screen (in setContentView(int))
+    //   2) Getting references to inflated widgets
+    //   3) Setting listeners on widgets to handle user interaction
+    //   4) Connecting to an external model data
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate(Bundle) called");
         // setContentView(int layoutResID) inflates a layout and puts it on the screen
         setContentView(R.layout.activity_quiz);
         // You can get a reference to an inflated widget by calling
@@ -65,6 +80,40 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
         updateQuestion();
+    }
+    @Override
+    protected void onStart() {
+        // onStart is called by the OS when the Activity goes from stopped state
+        //  to the paused state
+        super.onStart();
+        Log.d(TAG, "onStart() called");
+    }
+    @Override
+    protected void onResume() {
+        // onResume is called by the OS when the Activity goes from paused state to
+        //  resumed state
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+    }
+    @Override
+    protected void onPause() {
+        // onPause is called by the OS when the Activity goes from the resumed state to
+        //  the paused state.
+        super.onPause();
+        Log.d(TAG, "onPause() called");
+    }
+    @Override
+    protected void onStop() {
+        // onStop is called by the OS when the Activity goes from paused to stopped state
+        super.onStop();
+        Log.d(TAG, "onStop() called");
+    }
+    @Override
+    protected void onDestroy() {
+        // onDestroy is called by the OS when the Activity goes from stopped to nonexistent
+        //  state. Activity is no longer in memory after onDestroy.
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
     }
     // Private methods
     private void updateQuestion() {
