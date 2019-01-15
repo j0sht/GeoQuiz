@@ -9,12 +9,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 public class QuizActivity extends AppCompatActivity {
     // Private static member variables
     // TAG is used in the first parameter to android.Util.Log.d(String tag, String msg)
     // TAG makes it easy to determine the source of the msg
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CORRECT = "correctCount";
+    private static final String KEY_ANSWER = "answerCount";
+    private static final String KEY_SCORE = "scoreDisplayed";
+    private static final String KEY_ANSWERED = "answeredArray";
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
     // View objects
@@ -52,8 +58,15 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         // setContentView(int layoutResID) inflates a layout and puts it on the screen
         setContentView(R.layout.activity_quiz);
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            scoreDisplayed = savedInstanceState.getBoolean(KEY_SCORE, false);
+            correctCount = savedInstanceState.getInt(KEY_CORRECT, 0);
+            answerCount = savedInstanceState.getInt(KEY_ANSWER, 0);
+            boolean[] answered = savedInstanceState.getBooleanArray(KEY_ANSWERED);
+            for (int i = 0; i < mQuestionBank.length; i++)
+                mQuestionBank[i].setAnswerGiven(answered[i]);
+        }
         // You can get a reference to an inflated widget by calling
         //  public View findViewById(int id)
         // This method accepts a resource ID of a widget and returns a (generic) View object
@@ -134,6 +147,13 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putBoolean(KEY_SCORE, scoreDisplayed);
+        outState.putInt(KEY_CORRECT, correctCount);
+        outState.putInt(KEY_ANSWER, answerCount);
+        boolean[] answered = new boolean[mQuestionBank.length];
+        for (int i = 0; i < mQuestionBank.length; i++)
+            answered[i] = mQuestionBank[i].isAnswerGiven();
+        outState.putBooleanArray(KEY_ANSWERED, answered);
     }
     // Private methods
     private void checkAnswer(boolean userPressedTrue) {
@@ -156,16 +176,13 @@ public class QuizActivity extends AppCompatActivity {
         updateView();
     }
     private void updateView() {
-        if (mQuestionBank[mCurrentIndex].isAnswerGiven()) {
-            mTrueButton.setEnabled(false);
-            mFalseButton.setEnabled(false);
-        } else {
-            mTrueButton.setEnabled(true);
-            mFalseButton.setEnabled(true);
-        }
+        boolean answerGiven = mQuestionBank[mCurrentIndex].isAnswerGiven();
+        mTrueButton.setEnabled(!answerGiven);
+        mFalseButton.setEnabled(!answerGiven);
         int question = mQuestionBank[mCurrentIndex].getTextResID();
         mQuestionTexView.setText(question);
         if ((answerCount == mQuestionBank.length) && !scoreDisplayed) {
+            Log.d(TAG, "Displayed score");
             double score = (double) correctCount / (double) mQuestionBank.length;
             String toastText = String.format(
                     "You got %d/%d = %.2f%%",
