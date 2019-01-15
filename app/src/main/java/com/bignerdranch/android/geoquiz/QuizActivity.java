@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ public class QuizActivity extends AppCompatActivity {
     // TAG is used in the first parameter to android.Util.Log.d(String tag, String msg)
     // TAG makes it easy to determine the source of the msg
     private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
     // View objects
@@ -47,6 +49,8 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         // setContentView(int layoutResID) inflates a layout and puts it on the screen
         setContentView(R.layout.activity_quiz);
+        if (savedInstanceState != null)
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
         // You can get a reference to an inflated widget by calling
         //  public View findViewById(int id)
         // This method accepts a resource ID of a widget and returns a (generic) View object
@@ -114,6 +118,19 @@ public class QuizActivity extends AppCompatActivity {
         //  state. Activity is no longer in memory after onDestroy.
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
+    }
+    // Other Activity Methods
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // onSaveInstanceState(Bundle) is called before onStop(), except when the
+        //  user presses the back button.
+        // Default implementation directs all of the activity's views to save their state
+        //  as data in the Bundle object.
+        // A Bundle is a structure that maps string keys to values of certain limited types.
+        //  (primitive types and classes that implement Serializable or Parceable interfaces)
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState");
+        outState.putInt(KEY_INDEX, mCurrentIndex);
     }
     // Private methods
     private void updateQuestion() {
