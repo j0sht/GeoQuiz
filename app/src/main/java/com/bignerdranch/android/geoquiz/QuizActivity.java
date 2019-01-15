@@ -32,6 +32,9 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
     private int mCurrentIndex = 0;
+    private boolean scoreDisplayed = false;
+    private int correctCount = 0;
+    private int answerCount = 0;
     // ACTIVITY LIFECYCLE METHODS
     // The onCreate(Bundle) method is called when an instance of the activity
     //  subclass is created.
@@ -134,12 +137,15 @@ public class QuizActivity extends AppCompatActivity {
     }
     // Private methods
     private void checkAnswer(boolean userPressedTrue) {
+        answerCount++;
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         int messageResID = 0;
-        if (userPressedTrue == answerIsTrue)
+        if (userPressedTrue == answerIsTrue) {
             messageResID = R.string.correct_toast;
-        else
+            correctCount++;
+        } else {
             messageResID = R.string.incorrect_toast;
+        }
         // A toast is a short message that informs the user of something, but does
         //  not require any input or action.
         // Note that for the context argument you can't simply use 'this', since
@@ -159,5 +165,14 @@ public class QuizActivity extends AppCompatActivity {
         }
         int question = mQuestionBank[mCurrentIndex].getTextResID();
         mQuestionTexView.setText(question);
+        if ((answerCount == mQuestionBank.length) && !scoreDisplayed) {
+            double score = (double) correctCount / (double) mQuestionBank.length;
+            String toastText = String.format(
+                    "You got %d/%d = %.2f%%",
+                    correctCount, mQuestionBank.length, score*100
+            );
+            Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
+            scoreDisplayed = true;
+        }
     }
 }
