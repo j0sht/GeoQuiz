@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.content.Intent;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mCheatButton;
     private TextView mQuestionTexView;
     // Model objects
     private Question[] mQuestionBank = new Question[] {
@@ -81,6 +83,34 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
                 updateQuestion();
+            }
+        });
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start Cheat activity
+
+                // An intent is an object that a component can use to communicate with the OS.
+                // The only components you have seen so far are activities, but there are also
+                //  services, broadcast receivers, and content providers.
+                // There are many different constructors for Intent's
+                // In this one, the first argument tells the ActivityManager which application
+                //  package the activity class can be found in.
+                // The second argument specifies the activity class that the ActivityManager
+                //  should start.
+                // When you create an Intent with a Context and a Class object, you are
+                //  creating an explicit intent. You use explicit intents to start activities
+                //  within your application. When an activity in your application wants
+                //  to start an activity in another application you create an implicit intent.
+                Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
+                // startActivity is a call to the Android OS, in particular, a part of the OS
+                //  called the ActivityManager. The ActivityManager then creates the Activity
+                //  instance and calls its onCreate(Bundle) method
+                startActivity(intent);
+                // The ActivityManager check's the package's manifest for a declaration with
+                //  the same name as the specified Class. If it does not find it, you get
+                //  a ActivityNotFoundException
             }
         });
         updateQuestion();
