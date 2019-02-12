@@ -2,6 +2,7 @@ package com.bignerdranch.android.geoquiz;
 
 import android.content.Intent;
 import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ public class QuizActivity extends AppCompatActivity {
     // TAG makes it easy to determine the source of the msg
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
     // View objects
@@ -34,6 +36,7 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
     // ACTIVITY LIFECYCLE METHODS
     // The onCreate(Bundle) method is called when an instance of the activity
     //  subclass is created.
@@ -103,11 +106,16 @@ public class QuizActivity extends AppCompatActivity {
                 //  creating an explicit intent. You use explicit intents to start activities
                 //  within your application. When an activity in your application wants
                 //  to start an activity in another application you create an implicit intent.
-                Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
+                boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+                Intent intent = CheatActivity.newIntent(QuizActivity.this, answerIsTrue);
                 // startActivity is a call to the Android OS, in particular, a part of the OS
                 //  called the ActivityManager. The ActivityManager then creates the Activity
                 //  instance and calls its onCreate(Bundle) method
-                startActivity(intent);
+                // The second argument is a 'request code'. It is a user-defined integer that
+                //  is sent to the child activity and then received back by the parent. It is
+                //  used when an activity starts more than one type of child activity and needs
+                //  to know who is reporting back.
+                startActivityForResult(intent, REQUEST_CODE_CHEAT);
                 // The ActivityManager check's the package's manifest for a declaration with
                 //  the same name as the specified Class. If it does not find it, you get
                 //  a ActivityNotFoundException
@@ -162,6 +170,19 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != AppCompatActivity.RESULT_OK)
+            return;
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null)
+                return;
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
+    }
+
     // Private methods
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResID();
@@ -170,10 +191,14 @@ public class QuizActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         int messageResID = 0;
-        if (userPressedTrue == answerIsTrue)
-            messageResID = R.string.correct_toast;
-        else
-            messageResID = R.string.incorrect_toast;
+        if (mIsCheater)
+            messageResID = R.string.judgment_toast;
+        else {
+            if (userPressedTrue == answerIsTrue)
+                messageResID = R.string.correct_toast;
+            else
+                messageResID = R.string.incorrect_toast;
+        }
         // A toast is a short message that informs the user of something, but does
         //  not require any input or action.
         // Note that for the context argument you can't simply use 'this', since
