@@ -17,6 +17,7 @@ public class QuizActivity extends AppCompatActivity {
     // TAG makes it easy to determine the source of the msg
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEAT = "cheat";
     private static final int REQUEST_CODE_CHEAT = 0;
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
@@ -54,8 +55,10 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         // setContentView(int layoutResID) inflates a layout and puts it on the screen
         setContentView(R.layout.activity_quiz);
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mIsCheater = savedInstanceState.getBoolean(KEY_CHEAT, false);
+        }
         // You can get a reference to an inflated widget by calling
         //  public View findViewById(int id)
         // This method accepts a resource ID of a widget and returns a (generic) View object
@@ -172,6 +175,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putBoolean(KEY_CHEAT, mIsCheater);
     }
 
     @Override
