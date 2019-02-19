@@ -1,7 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
 import android.content.Intent;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +16,7 @@ public class QuizActivity extends AppCompatActivity {
     // TAG makes it easy to determine the source of the msg
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEAT_COUNT = "cheat_count";
     private static final int REQUEST_CODE_CHEAT = 0;
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
@@ -26,6 +26,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mNextButton;
     private Button mCheatButton;
     private TextView mQuestionTexView;
+    private TextView mCheatsRemainingTextView;
     // Model objects
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -37,6 +38,7 @@ public class QuizActivity extends AppCompatActivity {
     };
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
+    private int cheatsRemaining = 3;
     // ACTIVITY LIFECYCLE METHODS
     // The onCreate(Bundle) method is called when an instance of the activity
     //  subclass is created.
@@ -54,8 +56,10 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         // setContentView(int layoutResID) inflates a layout and puts it on the screen
         setContentView(R.layout.activity_quiz);
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            cheatsRemaining = savedInstanceState.getInt(KEY_CHEAT_COUNT, 3);
+        }
         // You can get a reference to an inflated widget by calling
         //  public View findViewById(int id)
         // This method accepts a resource ID of a widget and returns a (generic) View object
@@ -86,7 +90,7 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
                 mIsCheater = false;
-                updateQuestion();
+                updateViews();
             }
         });
         mCheatButton = (Button) findViewById(R.id.cheat_button);
@@ -124,7 +128,9 @@ public class QuizActivity extends AppCompatActivity {
                 //  an ActivityNotFoundException
             }
         });
-        updateQuestion();
+
+        mCheatsRemainingTextView = (TextView) findViewById(R.id.cheats_remaining_text);
+        updateViews();
     }
     @Override
     protected void onStart() {
@@ -172,6 +178,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putInt(KEY_CHEAT_COUNT, cheatsRemaining);
     }
 
     @Override
@@ -183,13 +190,20 @@ public class QuizActivity extends AppCompatActivity {
             if (data == null)
                 return;
             mIsCheater = CheatActivity.wasAnswerShown(data);
+            if (mIsCheater && cheatsRemaining > 0) {
+                cheatsRemaining--;
+                updateViews();
+            }
         }
     }
 
     // Private methods
-    private void updateQuestion() {
+    private void updateViews() {
         int question = mQuestionBank[mCurrentIndex].getTextResID();
         mQuestionTexView.setText(question);
+        mCheatsRemainingTextView.setText(String.format("Cheats Remaining: %d", cheatsRemaining));
+        if (cheatsRemaining <= 0)
+            mCheatButton.setEnabled(false);
     }
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();

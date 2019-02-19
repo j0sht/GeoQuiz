@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.bignerdranch.android.geoquiz.QuizActivity">
     <TextView
         android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
@@ -27,6 +29,13 @@
             android:layout_height="wrap_content"
             android:text="@string/false_button"/>
     </LinearLayout>
+    <TextView
+        android:id="@+id/cheats_remaining_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:padding="24dp"
+        tools:text="Cheats Remaining" />
     <Button
         android:id="@+id/cheat_button"
         android:layout_width="wrap_content"
