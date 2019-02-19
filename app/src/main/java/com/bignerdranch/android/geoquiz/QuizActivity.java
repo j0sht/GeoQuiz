@@ -85,6 +85,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -108,6 +109,7 @@ public class QuizActivity extends AppCompatActivity {
                 //  to start an activity in another application you create an implicit intent.
                 boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
                 Intent intent = CheatActivity.newIntent(QuizActivity.this, answerIsTrue);
+
                 // startActivity is a call to the Android OS, in particular, a part of the OS
                 //  called the ActivityManager. The ActivityManager then creates the Activity
                 //  instance and calls its onCreate(Bundle) method
@@ -116,9 +118,10 @@ public class QuizActivity extends AppCompatActivity {
                 //  used when an activity starts more than one type of child activity and needs
                 //  to know who is reporting back.
                 startActivityForResult(intent, REQUEST_CODE_CHEAT);
+
                 // The ActivityManager check's the package's manifest for a declaration with
                 //  the same name as the specified Class. If it does not find it, you get
-                //  a ActivityNotFoundException
+                //  an ActivityNotFoundException
             }
         });
         updateQuestion();
