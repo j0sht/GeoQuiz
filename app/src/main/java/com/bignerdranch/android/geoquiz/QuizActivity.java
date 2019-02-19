@@ -18,6 +18,7 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_CHEAT = "cheat";
+    private static final String KEY_CHEAT_ARRAY = "cheat_array";
     private static final int REQUEST_CODE_CHEAT = 0;
     // Notice the m prefix on the two member variable names
     // This is an Android naming convention.
@@ -38,6 +39,7 @@ public class QuizActivity extends AppCompatActivity {
     };
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
+    private boolean[] mCheatedQuestions = new boolean[mQuestionBank.length];
     // ACTIVITY LIFECYCLE METHODS
     // The onCreate(Bundle) method is called when an instance of the activity
     //  subclass is created.
@@ -58,6 +60,7 @@ public class QuizActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
             mIsCheater = savedInstanceState.getBoolean(KEY_CHEAT, false);
+            mCheatedQuestions = savedInstanceState.getBooleanArray(KEY_CHEAT_ARRAY);
         }
         // You can get a reference to an inflated widget by calling
         //  public View findViewById(int id)
@@ -88,7 +91,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                mIsCheater = false;
+                mIsCheater = mCheatedQuestions[mCurrentIndex];
                 updateQuestion();
             }
         });
@@ -176,6 +179,7 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
         outState.putBoolean(KEY_CHEAT, mIsCheater);
+        outState.putBooleanArray(KEY_CHEAT_ARRAY, mCheatedQuestions);
     }
 
     @Override
@@ -187,6 +191,7 @@ public class QuizActivity extends AppCompatActivity {
             if (data == null)
                 return;
             mIsCheater = CheatActivity.wasAnswerShown(data);
+            mCheatedQuestions[mCurrentIndex] = mIsCheater;
         }
     }
 
