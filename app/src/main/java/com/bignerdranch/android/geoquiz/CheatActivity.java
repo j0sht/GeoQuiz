@@ -12,6 +12,7 @@ public class CheatActivity extends AppCompatActivity {
     private static final String EXTRA_ANSWER_IS_TRUE = "com.bignerdranch.android.geoquiz.answer_is_true";
     private static final String EXTRA_ANSWER_SHOWN = "com.bignerdranch.android.geoquiz.answer_shown";
     private boolean mAnswerIsTrue;
+    private boolean mAnswerShown;
 
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
@@ -21,21 +22,32 @@ public class CheatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cheat);
 
+        if (savedInstanceState != null)
+            mAnswerShown = savedInstanceState.getBoolean(EXTRA_ANSWER_SHOWN, false);
+
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
         mAnswerTextView = (TextView) findViewById(R.id.answer_text_view);
+        if (mAnswerShown) {
+            setAnswerTextView();
+            setAnswerShownResult(mAnswerShown);
+        }
 
         mShowAnswerButton = (Button) findViewById(R.id.show_answer_button);
         mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mAnswerIsTrue)
-                    mAnswerTextView.setText(R.string.true_button);
-                else
-                    mAnswerTextView.setText(R.string.false_button);
-                setAnswerShownResult(true);
+                setAnswerTextView();
+                mAnswerShown = true;
+                setAnswerShownResult(mAnswerShown);
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(EXTRA_ANSWER_SHOWN, mAnswerShown);
     }
 
     public static Intent newIntent(Context packageContext, boolean answerIsTrue) {
@@ -62,5 +74,12 @@ public class CheatActivity extends AppCompatActivity {
         // If setResult is not called, then when the user presses the Back button, the parent
         //  will receive Activity.RESULT_CANCELLED
         setResult(RESULT_OK, data);
+    }
+
+    private void setAnswerTextView() {
+        if (mAnswerIsTrue)
+            mAnswerTextView.setText(R.string.true_button);
+        else
+            mAnswerTextView.setText(R.string.false_button);
     }
 }
